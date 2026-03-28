@@ -17,6 +17,7 @@ declare global {
 let currentFile: PrompterFile | null = null;
 let currentPageIndex = 0;
 let prompterActive = false;
+let nextPageId = 1;
 
 // DOM Elements
 const showTitleEl = document.getElementById('show-title') as HTMLSpanElement;
@@ -103,6 +104,7 @@ function broadcastCurrentPage(): void {
 function loadFile(file: PrompterFile): void {
   currentFile = file;
   currentPageIndex = 0;
+  nextPageId = file.pages.reduce((max, p) => Math.max(max, p.id), 0) + 1;
   showTitleEl.textContent = file.title || 'Untitled Show';
   renderPageList();
   showEditor();
@@ -142,7 +144,7 @@ btnAddPage.addEventListener('click', () => {
   saveCurrentEdits();
 
   const newPage: PrompterPage = {
-    id: Date.now(),
+    id: nextPageId++,
     title: `Page ${currentFile.pages.length + 1}`,
     content: '',
   };
