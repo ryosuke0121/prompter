@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'">
+  <title>Prompter - Control</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <div class="header-left">
+        <h1 class="app-title">⚡ Prompter</h1>
+        <span id="show-title" class="show-title">No file loaded</span>
+      </div>
+      <div class="header-actions">
+        <button id="btn-new" class="btn btn-secondary">New</button>
+        <button id="btn-open" class="btn btn-secondary">Open</button>
+        <button id="btn-save" class="btn btn-secondary">Save</button>
+        <button id="btn-add-page" class="btn btn-primary">+ Add Page</button>
+      </div>
+    </header>
+
+    <div class="main-content">
+      <aside class="sidebar">
+        <h2 class="sidebar-title">Pages</h2>
+        <ul id="page-list" class="page-list"></ul>
+      </aside>
+
+      <section class="editor">
+        <div id="editor-empty" class="editor-empty">
+          <p>Open or create a file to get started.</p>
+        </div>
+
+        <div id="editor-form" class="editor-form" style="display:none;">
+          <div class="form-group">
+            <label for="page-title">Page Title</label>
+            <input type="text" id="page-title" class="input" placeholder="Enter page title..." />
+          </div>
+          <div class="form-group">
+            <label for="page-content">Content</label>
+            <textarea id="page-content" class="textarea" placeholder="Enter page content..."></textarea>
+          </div>
+          <div class="form-actions">
+            <button id="btn-delete-page" class="btn btn-danger">Delete Page</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <footer class="footer">
+      <div class="footer-nav">
+        <button id="btn-prev" class="btn btn-nav" title="Previous (←)">&#8592; Prev</button>
+        <span id="page-counter" class="page-counter">— / —</span>
+        <button id="btn-next" class="btn btn-nav" title="Next (→)">Next &#8594;</button>
+      </div>
+      <div class="footer-prompter">
+        <button id="btn-start-prompter" class="btn btn-success">▶ Start Prompter</button>
+        <button id="btn-stop-prompter" class="btn btn-danger" style="display:none;">■ Stop Prompter</button>
+      </div>
+    </footer>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
