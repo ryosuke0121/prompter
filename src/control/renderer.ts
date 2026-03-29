@@ -1,4 +1,5 @@
 import { PrompterFile, PrompterPage } from '../types';
+import { Language, getInitialLanguage, setSavedLanguage, translate } from './i18n';
 
 declare global {
   interface Window {
@@ -18,25 +19,44 @@ let currentFile: PrompterFile | null = null;
 let currentPageIndex = 0;
 let prompterActive = false;
 let nextPageId = 1;
+let currentLanguage: Language = getInitialLanguage();
 
-// DOM Elements
-const showTitleEl = document.getElementById('show-title') as HTMLSpanElement;
-const pageListEl = document.getElementById('page-list') as HTMLUListElement;
-const editorEmpty = document.getElementById('editor-empty') as HTMLDivElement;
-const editorForm = document.getElementById('editor-form') as HTMLDivElement;
-const pageTitleInput = document.getElementById('page-title') as HTMLInputElement;
-const pageContentTextarea = document.getElementById('page-content') as HTMLTextAreaElement;
-const pageCounterEl = document.getElementById('page-counter') as HTMLSpanElement;
+function getRequiredElement<T extends HTMLElement>(id: string): T {
+  const element = document.getElementById(id);
+  if (!element) {
+    throw new Error(`Element not found: ${id}`);
+  }
+  return element as T;
+}
 
-const btnNew = document.getElementById('btn-new') as HTMLButtonElement;
-const btnOpen = document.getElementById('btn-open') as HTMLButtonElement;
-const btnSave = document.getElementById('btn-save') as HTMLButtonElement;
-const btnAddPage = document.getElementById('btn-add-page') as HTMLButtonElement;
-const btnDeletePage = document.getElementById('btn-delete-page') as HTMLButtonElement;
-const btnPrev = document.getElementById('btn-prev') as HTMLButtonElement;
-const btnNext = document.getElementById('btn-next') as HTMLButtonElement;
-const btnStartPrompter = document.getElementById('btn-start-prompter') as HTMLButtonElement;
-const btnStopPrompter = document.getElementById('btn-stop-prompter') as HTMLButtonElement;
+const showTitleEl = getRequiredElement<HTMLSpanElement>('show-title');
+const pageListEl = getRequiredElement<HTMLUListElement>('page-list');
+const editorEmpty = getRequiredElement<HTMLDivElement>('editor-empty');
+const editorForm = getRequiredElement<HTMLDivElement>('editor-form');
+const pageTitleInput = getRequiredElement<HTMLInputElement>('page-title');
+const pageContentTextarea = getRequiredElement<HTMLTextAreaElement>('page-content');
+const pageCounterEl = getRequiredElement<HTMLSpanElement>('page-counter');
+
+const btnNew = getRequiredElement<HTMLButtonElement>('btn-new');
+const btnOpen = getRequiredElement<HTMLButtonElement>('btn-open');
+const btnSave = getRequiredElement<HTMLButtonElement>('btn-save');
+const btnAddPage = getRequiredElement<HTMLButtonElement>('btn-add-page');
+const btnSettings = getRequiredElement<HTMLButtonElement>('btn-settings');
+const btnDeletePage = getRequiredElement<HTMLButtonElement>('btn-delete-page');
+const btnPrev = getRequiredElement<HTMLButtonElement>('btn-prev');
+const btnNext = getRequiredElement<HTMLButtonElement>('btn-next');
+const btnStartPrompter = getRequiredElement<HTMLButtonElement>('btn-start-prompter');
+const btnStopPrompter = getRequiredElement<HTMLButtonElement>('btn-stop-prompter');
+const settingsModal = getRequiredElement<HTMLDivElement>('settings-modal');
+const settingsCloseBtn = getRequiredElement<HTMLButtonElement>('btn-settings-close');
+const languageSelect = getRequiredElement<HTMLSelectElement>('language-select');
+const appTitle = getRequiredElement<HTMLHeadingElement>('app-title');
+const sidebarTitle = getRequiredElement<HTMLHeadingElement>('sidebar-title');
+const editorEmptyText = getRequiredElement<HTMLParagraphElement>('editor-empty-text');
+const pageTitleLabel = getRequiredElement<HTMLLabelElement>('label-page-title');
+const pageContentLabel = getRequiredElement<HTMLLabelElement>('label-page-content');
+const settingsTitle = getRequiredElement<HTMLHeadingElement>('settings-title');
+const languageLabel = getRequiredElement<HTMLLabelElement>('label-language');
 
 function renderPageList(): void {
   pageListEl.innerHTML = '';
@@ -89,7 +109,7 @@ function saveCurrentEdits(): void {
 
 function updatePageCounter(): void {
   if (!currentFile || currentFile.pages.length === 0) {
-    pageCounterEl.textContent = '— / —';
+    pageCounterEl.textContent = translate(currentLanguage, 'noPageCounter');
     return;
   }
   pageCounterEl.textContent = `${currentPageIndex + 1} / ${currentFile.pages.length}`;
@@ -105,7 +125,7 @@ function loadFile(file: PrompterFile): void {
   currentFile = file;
   currentPageIndex = 0;
   nextPageId = file.pages.reduce((max, p) => Math.max(max, p.id), 0) + 1;
-  showTitleEl.textContent = file.title || 'Untitled Show';
+  showTitleEl.textContent = file.title || translate(currentLanguage, 'untitledShow');
   renderPageList();
   showEditor();
   updatePageCounter();
@@ -138,14 +158,14 @@ btnSave.addEventListener('click', async () => {
 
 btnAddPage.addEventListener('click', () => {
   if (!currentFile) {
-    currentFile = { title: 'New Show', pages: [] };
+    currentFile = { title: translate(currentLanguage, 'newShow'), pages: [] };
     showTitleEl.textContent = currentFile.title;
   }
   saveCurrentEdits();
 
   const newPage: PrompterPage = {
     id: nextPageId++,
-    title: `Page ${currentFile.pages.length + 1}`,
+    title: `${translate(currentLanguage, 'page')} ${currentFile.pages.length + 1}`,
     content: '',
   };
   currentFile.pages.push(newPage);
@@ -219,6 +239,71 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// Initial render
+function applyLanguage(language: Language): void {
+  const previousLanguage = currentLanguage;
+  currentLanguage = language;
+  document.documentElement.lang = language;
+  appTitle.textContent = translate(language, 'appTitle');
+  if (!currentFile) {
+    showTitleEl.textContent = translate(language, 'noFileLoaded');
+  } else if (
+    currentFile.title === translate(previousLanguage, 'newShow') ||
+    currentFile.title === translate(previousLanguage, 'untitledShow')
+  ) {
+    const isNewShowTitle = currentFile.title === translate(previousLanguage, 'newShow');
+    const titleKey = isNewShowTitle ? 'newShow' : 'untitledShow';
+    currentFile.title = translate(language, titleKey);
+    showTitleEl.textContent = currentFile.title;
+  }
+  btnNew.textContent = translate(language, 'new');
+  btnOpen.textContent = translate(language, 'open');
+  btnSave.textContent = translate(language, 'save');
+  btnAddPage.textContent = translate(language, 'addPage');
+  btnSettings.textContent = translate(language, 'settings');
+  sidebarTitle.textContent = translate(language, 'pages');
+  editorEmptyText.textContent = translate(language, 'emptyState');
+  pageTitleLabel.textContent = translate(language, 'pageTitleLabel');
+  pageContentLabel.textContent = translate(language, 'pageContentLabel');
+  pageTitleInput.placeholder = translate(language, 'pageTitlePlaceholder');
+  pageContentTextarea.placeholder = translate(language, 'pageContentPlaceholder');
+  btnDeletePage.textContent = translate(language, 'deletePage');
+  btnPrev.textContent = translate(language, 'prev');
+  btnPrev.title = translate(language, 'previousTitle');
+  btnNext.textContent = translate(language, 'next');
+  btnNext.title = translate(language, 'nextTitle');
+  btnStartPrompter.textContent = translate(language, 'startPrompter');
+  btnStopPrompter.textContent = translate(language, 'stopPrompter');
+  settingsTitle.textContent = translate(language, 'settingsTitle');
+  languageLabel.textContent = translate(language, 'language');
+  settingsCloseBtn.textContent = translate(language, 'close');
+  languageSelect.value = language;
+  updatePageCounter();
+}
+
+btnSettings.addEventListener('click', () => {
+  settingsModal.style.display = 'flex';
+});
+
+settingsCloseBtn.addEventListener('click', () => {
+  settingsModal.style.display = 'none';
+});
+
+settingsModal.addEventListener('click', (event) => {
+  if (event.target === settingsModal) {
+    settingsModal.style.display = 'none';
+  }
+});
+
+languageSelect.addEventListener('change', () => {
+  const selected = languageSelect.value;
+  if (selected !== 'en' && selected !== 'ja') {
+    return;
+  }
+  const language: Language = selected;
+  setSavedLanguage(language);
+  applyLanguage(language);
+});
+
+applyLanguage(currentLanguage);
 showEditor();
 updatePageCounter();

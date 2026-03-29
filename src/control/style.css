@@ -305,3 +305,27 @@ body {
 .btn-danger:hover:not(:disabled) {
   background: #c0392b;
 }
+
+.settings-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-panel {
+  width: 360px;
+  max-width: calc(100vw - 32px);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 18px;
+}
+
+.settings-title {
+  margin-bottom: 14px;
+  font-size: 18px;
+}
