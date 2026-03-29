@@ -295,7 +295,11 @@ settingsModal.addEventListener('click', (event) => {
 });
 
 languageSelect.addEventListener('change', () => {
-  const language = languageSelect.value === 'ja' ? 'ja' : 'en';
+  const selected = languageSelect.value;
+  if (selected !== 'en' && selected !== 'ja') {
+    return;
+  }
+  const language: Language = selected;
   setSavedLanguage(language);
   applyLanguage(language);
 });

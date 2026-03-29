@@ -75,5 +75,5 @@ export function setSavedLanguage(language: Language): void {
 }
 
 export function translate(language: Language, key: keyof typeof resources.en): string {
-  return resources[language][key];
+  return resources[language][key] ?? resources.en[key];
 }
