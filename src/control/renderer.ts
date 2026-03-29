@@ -240,11 +240,19 @@ document.addEventListener('keydown', (e) => {
 });
 
 function applyLanguage(language: Language): void {
+  const previousLanguage = currentLanguage;
   currentLanguage = language;
   document.documentElement.lang = language;
   appTitle.textContent = translate(language, 'appTitle');
   if (!currentFile) {
     showTitleEl.textContent = translate(language, 'noFileLoaded');
+  } else if (
+    currentFile.title === translate(previousLanguage, 'newShow') ||
+    currentFile.title === translate(previousLanguage, 'untitledShow')
+  ) {
+    const titleKey = currentFile.title === translate(previousLanguage, 'newShow') ? 'newShow' : 'untitledShow';
+    currentFile.title = translate(language, titleKey);
+    showTitleEl.textContent = currentFile.title;
   }
   btnNew.textContent = translate(language, 'new');
   btnOpen.textContent = translate(language, 'open');
