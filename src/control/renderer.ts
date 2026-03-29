@@ -250,7 +250,8 @@ function applyLanguage(language: Language): void {
     currentFile.title === translate(previousLanguage, 'newShow') ||
     currentFile.title === translate(previousLanguage, 'untitledShow')
   ) {
-    const titleKey = currentFile.title === translate(previousLanguage, 'newShow') ? 'newShow' : 'untitledShow';
+    const isNewShowTitle = currentFile.title === translate(previousLanguage, 'newShow');
+    const titleKey = isNewShowTitle ? 'newShow' : 'untitledShow';
     currentFile.title = translate(language, titleKey);
     showTitleEl.textContent = currentFile.title;
   }
