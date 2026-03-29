@@ -1,5 +1,5 @@
-import { PrompterFile, PrompterPage } from '../types';
-import { Language, getInitialLanguage, setSavedLanguage, translate } from './i18n';
+import { PrompterDisplayData, PrompterFile, PrompterPage } from '../types';
+import { Language, getInitialLanguage, getInitialTextColor, setSavedLanguage, setSavedTextColor, translate } from './i18n';
 
 declare global {
   interface Window {
@@ -7,8 +7,8 @@ declare global {
       openFile(): Promise<PrompterFile | null>;
       saveFile(data: PrompterFile): Promise<boolean>;
       newFile(): Promise<PrompterFile>;
-      onPrompterUpdate(callback: (page: PrompterPage) => void): void;
-      sendPageChange(data: PrompterPage): Promise<void>;
+      onPrompterUpdate(callback: (data: PrompterDisplayData) => void): void;
+      sendPageChange(data: PrompterDisplayData): Promise<void>;
       openPrompterWindow(): Promise<void>;
       closePrompterWindow(): Promise<void>;
     };
@@ -20,6 +20,13 @@ let currentPageIndex = 0;
 let prompterActive = false;
 let nextPageId = 1;
 let currentLanguage: Language = getInitialLanguage();
+const TEXT_COLOR_OPTIONS = ['#ffffff', '#ffff00', '#ff4d4f', '#52c41a'] as const;
+
+function normalizeTextColor(color: string | undefined): string {
+  return color && TEXT_COLOR_OPTIONS.includes(color as typeof TEXT_COLOR_OPTIONS[number]) ? color : '#ffffff';
+}
+
+let currentTextColor = normalizeTextColor(getInitialTextColor());
 
 function getRequiredElement<T extends HTMLElement>(id: string): T {
   const element = document.getElementById(id);
@@ -57,6 +64,12 @@ const pageTitleLabel = getRequiredElement<HTMLLabelElement>('label-page-title');
 const pageContentLabel = getRequiredElement<HTMLLabelElement>('label-page-content');
 const settingsTitle = getRequiredElement<HTMLHeadingElement>('settings-title');
 const languageLabel = getRequiredElement<HTMLLabelElement>('label-language');
+const textColorLabel = getRequiredElement<HTMLLabelElement>('label-text-color');
+const textColorSelect = getRequiredElement<HTMLSelectElement>('text-color-select');
+const textColorOptionWhite = getRequiredElement<HTMLOptionElement>('text-color-option-white');
+const textColorOptionYellow = getRequiredElement<HTMLOptionElement>('text-color-option-yellow');
+const textColorOptionRed = getRequiredElement<HTMLOptionElement>('text-color-option-red');
+const textColorOptionGreen = getRequiredElement<HTMLOptionElement>('text-color-option-green');
 
 function renderPageList(): void {
   pageListEl.innerHTML = '';
@@ -118,11 +131,15 @@ function updatePageCounter(): void {
 function broadcastCurrentPage(): void {
   if (!currentFile || currentFile.pages.length === 0) return;
   const page = currentFile.pages[currentPageIndex];
-  window.electronAPI.sendPageChange(page);
+  const textColor = normalizeTextColor(currentFile.textColor || currentTextColor);
+  window.electronAPI.sendPageChange({ page, textColor });
 }
 
 function loadFile(file: PrompterFile): void {
+  file.textColor = normalizeTextColor(file.textColor || currentTextColor);
   currentFile = file;
+  currentTextColor = file.textColor;
+  textColorSelect.value = currentTextColor;
   currentPageIndex = 0;
   nextPageId = file.pages.reduce((max, p) => Math.max(max, p.id), 0) + 1;
   showTitleEl.textContent = file.title || translate(currentLanguage, 'untitledShow');
@@ -158,7 +175,7 @@ btnSave.addEventListener('click', async () => {
 
 btnAddPage.addEventListener('click', () => {
   if (!currentFile) {
-    currentFile = { title: translate(currentLanguage, 'newShow'), pages: [] };
+    currentFile = { title: translate(currentLanguage, 'newShow'), pages: [], textColor: currentTextColor };
     showTitleEl.textContent = currentFile.title;
   }
   saveCurrentEdits();
@@ -275,8 +292,14 @@ function applyLanguage(language: Language): void {
   btnStopPrompter.textContent = translate(language, 'stopPrompter');
   settingsTitle.textContent = translate(language, 'settingsTitle');
   languageLabel.textContent = translate(language, 'language');
+  textColorLabel.textContent = translate(language, 'textColor');
+  textColorOptionWhite.textContent = translate(language, 'textColorWhite');
+  textColorOptionYellow.textContent = translate(language, 'textColorYellow');
+  textColorOptionRed.textContent = translate(language, 'textColorRed');
+  textColorOptionGreen.textContent = translate(language, 'textColorGreen');
   settingsCloseBtn.textContent = translate(language, 'close');
   languageSelect.value = language;
+  textColorSelect.value = currentFile?.textColor || currentTextColor;
   updatePageCounter();
 }
 
@@ -302,6 +325,16 @@ languageSelect.addEventListener('change', () => {
   const language: Language = selected;
   setSavedLanguage(language);
   applyLanguage(language);
+});
+
+textColorSelect.addEventListener('change', () => {
+  currentTextColor = normalizeTextColor(textColorSelect.value);
+  textColorSelect.value = currentTextColor;
+  setSavedTextColor(currentTextColor);
+  if (currentFile) {
+    currentFile.textColor = currentTextColor;
+    broadcastCurrentPage();
+  }
 });
 
 applyLanguage(currentLanguage);
