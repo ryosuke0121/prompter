@@ -3,6 +3,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 
 const commonConfig = {
   mode: 'development',
+  devtool: false,
   module: {
     rules: [
       {

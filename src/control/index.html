@@ -11,7 +11,7 @@
   <div class="app">
     <header class="header">
       <div class="header-left">
-        <h1 class="app-title">⚡ Prompter</h1>
+        <h1 id="app-title" class="app-title">⚡ Prompter</h1>
         <span id="show-title" class="show-title">No file loaded</span>
       </div>
       <div class="header-actions">
@@ -19,27 +19,28 @@
         <button id="btn-open" class="btn btn-secondary">Open</button>
         <button id="btn-save" class="btn btn-secondary">Save</button>
         <button id="btn-add-page" class="btn btn-primary">+ Add Page</button>
+        <button id="btn-settings" class="btn btn-secondary">Settings</button>
       </div>
     </header>
 
     <div class="main-content">
       <aside class="sidebar">
-        <h2 class="sidebar-title">Pages</h2>
+        <h2 id="sidebar-title" class="sidebar-title">Pages</h2>
         <ul id="page-list" class="page-list"></ul>
       </aside>
 
       <section class="editor">
         <div id="editor-empty" class="editor-empty">
-          <p>Open or create a file to get started.</p>
+          <p id="editor-empty-text">Open or create a file to get started.</p>
         </div>
 
         <div id="editor-form" class="editor-form" style="display:none;">
           <div class="form-group">
-            <label for="page-title">Page Title</label>
+            <label id="label-page-title" for="page-title">Page Title</label>
             <input type="text" id="page-title" class="input" placeholder="Enter page title..." />
           </div>
           <div class="form-group">
-            <label for="page-content">Content</label>
+            <label id="label-page-content" for="page-content">Content</label>
             <textarea id="page-content" class="textarea" placeholder="Enter page content..."></textarea>
           </div>
           <div class="form-actions">
@@ -60,6 +61,22 @@
         <button id="btn-stop-prompter" class="btn btn-danger" style="display:none;">■ Stop Prompter</button>
       </div>
     </footer>
+  </div>
+
+  <div id="settings-modal" class="settings-modal" style="display:none;">
+    <div class="settings-panel">
+      <h2 id="settings-title" class="settings-title">Settings</h2>
+      <div class="form-group">
+        <label id="label-language" for="language-select">Language</label>
+        <select id="language-select" class="input">
+          <option value="en">English</option>
+          <option value="ja">日本語</option>
+        </select>
+      </div>
+      <div class="form-actions">
+        <button id="btn-settings-close" class="btn btn-secondary">Close</button>
+      </div>
+    </div>
   </div>
 
   <script src="renderer.js"></script>
