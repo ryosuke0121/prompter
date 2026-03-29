@@ -66,7 +66,7 @@ npm start
 ### ビルド（パッケージ作成）
 
 ```bash
-# Windows (.exe)
+# Windows (.zip)
 npm run dist:win
 
 # macOS (.dmg)
@@ -84,6 +84,6 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
-Artifacts として `windows-build`（.exe）と `macos-build`（.dmg）がダウンロードできます。
+Artifacts として `windows-build`（.zip）と `macos-build`（.dmg）がダウンロードできます。
 
 macOS 版を配布して「壊れているため開けません」と表示されないようにするため、署名・公証（notarization）用の Secrets（`APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, `APPLE_TEAM_ID`, `CSC_LINK`, `CSC_KEY_PASSWORD`）を設定してください。
