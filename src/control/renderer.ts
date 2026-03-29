@@ -138,7 +138,7 @@ function broadcastCurrentPage(): void {
 function loadFile(file: PrompterFile): void {
   file.textColor = normalizeTextColor(file.textColor || currentTextColor);
   currentFile = file;
-  currentTextColor = normalizeTextColor(file.textColor);
+  currentTextColor = file.textColor;
   textColorSelect.value = currentTextColor;
   currentPageIndex = 0;
   nextPageId = file.pages.reduce((max, p) => Math.max(max, p.id), 0) + 1;
