@@ -3,7 +3,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 
 const commonConfig = {
   mode: 'development',
-  devtool: false,
+  devtool: 'cheap-module-source-map',
   module: {
     rules: [
       {
