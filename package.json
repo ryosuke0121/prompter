@@ -25,7 +25,8 @@
       "target": "nsis"
     },
     "mac": {
-      "target": "dmg"
+      "target": "dmg",
+      "hardenedRuntime": true
     }
   },
   "devDependencies": {
