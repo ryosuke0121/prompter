@@ -24,6 +24,11 @@ const resources: Record<Language, Dictionary> = {
     stopPrompter: '■ Stop Prompter',
     settingsTitle: 'Settings',
     language: 'Language',
+    textColor: 'Text Color',
+    textColorWhite: 'White',
+    textColorYellow: 'Yellow',
+    textColorRed: 'Red',
+    textColorGreen: 'Green',
     close: 'Close',
     previousTitle: 'Previous (←)',
     nextTitle: 'Next (→)',
@@ -53,6 +58,11 @@ const resources: Record<Language, Dictionary> = {
     stopPrompter: '■ プロンプター停止',
     settingsTitle: '設定',
     language: '言語',
+    textColor: '文字色',
+    textColorWhite: '白',
+    textColorYellow: '黄色',
+    textColorRed: '赤',
+    textColorGreen: '緑',
     close: '閉じる',
     previousTitle: '前へ (←)',
     nextTitle: '次へ (→)',
@@ -64,6 +74,7 @@ const resources: Record<Language, Dictionary> = {
 };
 
 const LANGUAGE_KEY = 'prompter-language';
+const TEXT_COLOR_KEY = 'prompter-text-color';
 
 export function getInitialLanguage(): Language {
   const saved = window.localStorage.getItem(LANGUAGE_KEY);
@@ -72,6 +83,14 @@ export function getInitialLanguage(): Language {
 
 export function setSavedLanguage(language: Language): void {
   window.localStorage.setItem(LANGUAGE_KEY, language);
+}
+
+export function getInitialTextColor(): string {
+  return window.localStorage.getItem(TEXT_COLOR_KEY) || '#ffffff';
+}
+
+export function setSavedTextColor(color: string): void {
+  window.localStorage.setItem(TEXT_COLOR_KEY, color);
 }
 
 export function translate(language: Language, key: keyof typeof resources.en): string {

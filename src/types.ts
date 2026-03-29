@@ -7,4 +7,10 @@ export interface PrompterPage {
 export interface PrompterFile {
   title: string;
   pages: PrompterPage[];
+  textColor?: string;
+}
+
+export interface PrompterDisplayData {
+  page: PrompterPage;
+  textColor: string;
 }

@@ -1,4 +1,4 @@
-import { PrompterFile, PrompterPage } from '../types';
+import { PrompterDisplayData, PrompterFile, PrompterPage } from '../types';
 
 declare global {
   interface Window {
@@ -6,8 +6,8 @@ declare global {
       openFile(): Promise<PrompterFile | null>;
       saveFile(data: PrompterFile): Promise<boolean>;
       newFile(): Promise<PrompterFile>;
-      onPrompterUpdate(callback: (page: PrompterPage) => void): void;
-      sendPageChange(data: PrompterPage): Promise<void>;
+      onPrompterUpdate(callback: (data: PrompterDisplayData) => void): void;
+      sendPageChange(data: PrompterDisplayData): Promise<void>;
       openPrompterWindow(): Promise<void>;
       closePrompterWindow(): Promise<void>;
     };
@@ -19,11 +19,12 @@ const pageIndicatorEl = document.getElementById('page-indicator') as HTMLDivElem
 const pageTitleEl = document.getElementById('page-title') as HTMLDivElement;
 const pageContentEl = document.getElementById('page-content') as HTMLDivElement;
 
-function displayPage(page: PrompterPage): void {
+function displayPage(page: PrompterPage, textColor: string): void {
   // Fade out
   container.classList.add('fade-out');
 
   setTimeout(() => {
+    document.body.style.color = textColor;
     pageIndicatorEl.textContent = `Page ${page.id}`;
     pageTitleEl.textContent = page.title;
 
@@ -38,6 +39,6 @@ function displayPage(page: PrompterPage): void {
   }, 150);
 }
 
-window.electronAPI.onPrompterUpdate((page: PrompterPage) => {
-  displayPage(page);
+window.electronAPI.onPrompterUpdate((data: PrompterDisplayData) => {
+  displayPage(data.page, data.textColor);
 });

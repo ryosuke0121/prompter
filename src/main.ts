@@ -1,7 +1,7 @@
 import { app, BrowserWindow, ipcMain, dialog, screen } from 'electron';
 import * as fs from 'fs';
 import * as path from 'path';
-import { PrompterFile } from './types';
+import { PrompterDisplayData, PrompterFile } from './types';
 
 let controlWindow: BrowserWindow | null = null;
 let prompterWindow: BrowserWindow | null = null;
@@ -126,7 +126,7 @@ ipcMain.handle('file:new', async () => {
   return emptyFile;
 });
 
-ipcMain.handle('prompter:update', (_event, pageData: unknown) => {
+ipcMain.handle('prompter:update', (_event, pageData: PrompterDisplayData) => {
   if (prompterWindow) {
     prompterWindow.webContents.send('prompter:page-update', pageData);
   }
